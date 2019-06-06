@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
 
@@ -37,5 +38,18 @@ public class DogController
         ArrayList<Dog> rtnDogs = DogsinitialApplication.ourDogList.
                 findDogs(d -> d.getBreed().toUpperCase().equals(breed.toUpperCase()));
         return new ResponseEntity<>(rtnDogs, HttpStatus.OK);
+    }
+
+    // Display all dogs ordered by breed
+    @GetMapping(value = "/breedtable")
+    public ModelAndView getDogsByBreed()
+    {
+        ModelAndView mav = new ModelAndView();
+        ArrayList<Dog> breedSortedDogs;
+        breedSortedDogs = DogsinitialApplication.ourDogList.sort((d1, d2) -> d1.getBreed().compareToIgnoreCase(d2.getBreed()));
+        mav.setViewName("dogs");
+        mav.addObject("dogList", breedSortedDogs);
+
+        return mav;
     }
 }
