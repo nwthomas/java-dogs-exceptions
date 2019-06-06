@@ -1,5 +1,6 @@
 package com.lambdaschool.dogsinitial.controller;
 
+import com.lambdaschool.dogsinitial.exception.ResourceNotFoundException;
 import com.lambdaschool.dogsinitial.model.Dog;
 import com.lambdaschool.dogsinitial.DogsinitialApplication;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,14 @@ public class DogController
     public ResponseEntity<?> getDogDetail(@PathVariable long id)
     {
         Dog rtnDog = DogsinitialApplication.ourDogList.findDog(d -> (d.getId() == id));
-        return new ResponseEntity<>(rtnDog, HttpStatus.OK);
+        if (rtnDog == null)
+        {
+            throw new ResourceNotFoundException("The dog with id " + id + " could not be found.");
+        }
+        else
+        {
+            return new ResponseEntity<>(rtnDog, HttpStatus.OK);
+        }
     }
 
     // localhost:8080/dogs/breeds/{breed}
@@ -37,18 +45,44 @@ public class DogController
     {
         ArrayList<Dog> rtnDogs = DogsinitialApplication.ourDogList.
                 findDogs(d -> d.getBreed().toUpperCase().equals(breed.toUpperCase()));
-        return new ResponseEntity<>(rtnDogs, HttpStatus.OK);
+        if (rtnDogs.size() == 0)
+        {
+            throw new ResourceNotFoundException("No dogs of breed " + breed + " were found.");
+        }
+        else
+        {
+            return new ResponseEntity<>(rtnDogs, HttpStatus.OK);
+        }
     }
 
     // Display all dogs ordered by breed
-    @GetMapping(value = "/breedtable")
-    public ModelAndView getDogsByBreed()
+    @GetMapping(value = "/breedstable")
+    public ModelAndView getDogsByBreeds()
     {
         ModelAndView mav = new ModelAndView();
-        ArrayList<Dog> breedSortedDogs;
-        breedSortedDogs = DogsinitialApplication.ourDogList.sort((d1, d2) -> d1.getBreed().compareToIgnoreCase(d2.getBreed()));
+        DogsinitialApplication.ourDogList.dogList.sort((d1, d2) -> d1.getBreed().compareToIgnoreCase(d2.getBreed()));
         mav.setViewName("dogs");
-        mav.addObject("dogList", breedSortedDogs);
+        mav.addObject("dogList", DogsinitialApplication.ourDogList.dogList);
+
+        return mav;
+    }
+
+    // Display all dogs suitable for apartments ordered by breed
+    @GetMapping(value = "/apartmentbreedstable")
+    public ModelAndView getApartmentBreeds()
+    {
+        ModelAndView mav = new ModelAndView();
+        DogsinitialApplication.ourDogList.dogList.sort((d1, d2) -> d1.getBreed().compareToIgnoreCase(d2.getBreed()));
+        ArrayList<Dog> apartmentDogs = new ArrayList<>();
+        for (Dog d : DogsinitialApplication.ourDogList.dogList)
+        {
+            if (d.isApartmentSuitable())
+            {
+                apartmentDogs.add(d);
+            }
+        }
+        mav.setViewName("dogs");
+        mav.addObject("dogList", apartmentDogs);
 
         return mav;
     }

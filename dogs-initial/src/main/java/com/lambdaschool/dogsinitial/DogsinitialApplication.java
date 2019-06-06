@@ -12,6 +12,7 @@ public class DogsinitialApplication
 {
 
     public static DogList ourDogList;
+
     public static void main(String[] args)
     {
         ourDogList = new DogList();
