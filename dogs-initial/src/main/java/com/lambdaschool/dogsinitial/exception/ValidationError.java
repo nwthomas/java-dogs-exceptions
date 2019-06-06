@@ -13,7 +13,7 @@ public class ValidationError
 
 	public ValidationError()
 	{
-
+		// Required
 	}
 
 	public String getCode()
