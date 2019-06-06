@@ -51,7 +51,7 @@ public class ErrorDetail
 		return timestamp;
 	}
 
-	public void setTimestamp(String timestamp)
+	public void setTimestamp(Long timestamp)
 	{
 		this.timestamp = new SimpleDateFormat("dd MMM yyyy HH:mm:ss:SSS z").format(new Date(timestamp));
 	}
